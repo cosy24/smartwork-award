@@ -1119,8 +1119,8 @@ function handleExcel(file) {
         if (skipSheets.indexOf(n) !== -1) return false;
         var ws2 = wb.Sheets[n];
         var rows2 = XLSX.utils.sheet_to_json(ws2, {header:1, defval:''});
-        // r[0] 기준으로 유효 행 확인 (SheetJS는 병합셀 파일에서 B열을 index 0으로 읽음)
-        var hasData = rows2.filter(function(r){ return r[0] && String(r[0]).trim().length > 2; });
+        // A열 또는 B열(양식에 따라 다름) 중 내용이 있는 쪽을 사용
+        var hasData = rows2.filter(function(r){ var v = r[0] || r[1]; return v && String(v).trim().length > 2; });
         return hasData.length >= 5;
       });
 
@@ -1159,10 +1159,11 @@ function parseSheetDirect(wb, sheetName) {
   var ws = wb.Sheets[sheetName];
   var rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
 
-  // r[0] = B열 실제 데이터 (SheetJS 병합셀 처리 특성)
+  // A열 또는 B열(양식에 따라 다름) 중 내용이 있는 쪽을 사용
   var lines = [];
   rows.forEach(function(r) {
-    var val = r[0] ? String(r[0]).replace(/\u00a0/g, ' ').trim() : '';
+    var raw = r[0] || r[1];
+    var val = raw ? String(raw).replace(/\u00a0/g, ' ').trim() : '';
     if (val) lines.push(val);
   });
 

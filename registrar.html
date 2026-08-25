@@ -665,7 +665,7 @@ function handleExcel(file){
       var validSheets=wb.SheetNames.filter(function(n){
         if(skipSheets.indexOf(n)!==-1)return false;
         var rows2=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''});
-        return rows2.filter(function(r){return r[0]&&String(r[0]).trim().length>2;}).length>=5;
+        return rows2.filter(function(r){var v=r[0]||r[1];return v&&String(v).trim().length>2;}).length>=5;
       });
       showUploadProg(false);
       if(validSheets.length===0){showToast('⚠️ 분석 가능한 시트가 없습니다.');return;}
@@ -685,7 +685,7 @@ function parseSheetDirect(wb,sheetName){
   var ws=wb.Sheets[sheetName];
   var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
   var lines=[];
-  rows.forEach(function(r){var val=r[0]?String(r[0]).replace(/\u00a0/g,' ').trim():'';if(val)lines.push(val);});
+  rows.forEach(function(r){var raw=r[0]||r[1];var val=raw?String(raw).replace(/\u00a0/g,' ').trim():'';if(val)lines.push(val);});
   var SECTION_KEYS={'1) 제출자 정보':'info','2) 활용한 AI 도구':'tools_sec','3) 업무 분야':'field_sec','4) 기존 업무 방식':'before_sec','5) AI 활용 방식':'how_sec','6) 성과 및 효과':'after_sec','7) 매출/수익성 기여':'revenue_sec','8) 확산 가능성':'spread_sec','※ 첨부 자료':'attach_sec'};
   var GUIDE=['AI 도구 활용 사례 제출 양식','AI 도구 활용 이전에는','어떻게 AI 도구를','어떤 성과가','AI 활용으로 직접','이 방법을 다른 팀','스크린샷, 비교 데이터','예) ChatGPT','예) 기획, 마케팅'];
   function isGuide(t){return GUIDE.some(function(p){return t.indexOf(p)!==-1;});}
