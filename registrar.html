@@ -681,6 +681,7 @@ function handleExcel(file){
   };
   reader.readAsArrayBuffer(file);
 }
+function deriveMonthFromDate(dateStr){if(!dateStr)return'';var m=String(dateStr).match(/(\d{4})[.\-\/](\d{1,2})/);if(!m)return'';return m[1]+'년 '+parseInt(m[2],10)+'월';}
 function parseSheetDirect(wb,sheetName){
   var ws=wb.Sheets[sheetName];
   var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
@@ -713,7 +714,7 @@ function parseSheetDirect(wb,sheetName){
   var after=(sections['after_sec']||'').trim(),revenue=(sections['revenue_sec']||'').trim(),spread=(sections['spread_sec']||'').trim();
   var noRev=['없음','없음.','-',''];
   if(revenue&&noRev.indexOf(revenue)===-1&&revenue.length>2)after=after+(after?'\n\n[매출/수익성 기여]\n':'')+revenue;
-  return{title:title,name:name,sub:(subTeam+(rank?' · '+rank:'')).trim(),org:'',field:field,month:'',submitDate:parsedDate||submitDate,tools:tools,before:before,how:how,after:after,highlight:'',spread:spread};
+  return{title:title,name:name,sub:(subTeam+(rank?' · '+rank:'')).trim(),org:'',field:field,month:deriveMonthFromDate(parsedDate||submitDate),submitDate:parsedDate||submitDate,tools:tools,before:before,how:how,after:after,highlight:'',spread:spread};
 }
 function renderSheetPreview(fileName){
   var area=document.getElementById('sheetPreviewArea');

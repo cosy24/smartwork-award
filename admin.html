@@ -1155,6 +1155,13 @@ function handleExcel(file) {
   reader.readAsArrayBuffer(file);
 }
 
+function deriveMonthFromDate(dateStr) {
+  if (!dateStr) return '';
+  var m = String(dateStr).match(/(\d{4})[.\-\/](\d{1,2})/);
+  if (!m) return '';
+  return m[1] + '년 ' + parseInt(m[2], 10) + '월';
+}
+
 function parseSheetDirect(wb, sheetName) {
   var ws = wb.Sheets[sheetName];
   var rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
@@ -1288,7 +1295,7 @@ function parseSheetDirect(wb, sheetName) {
     sub:        (subTeam + (rank ? ' · ' + rank : '')).trim(),
     org:        'AX2',
     field:      field,
-    month:      '2026년 6월',
+    month:      deriveMonthFromDate(parsedDate || submitDate) || '2026년 6월',
     submitDate: parsedDate || submitDate,
     tools:      tools,
     before:     before,
