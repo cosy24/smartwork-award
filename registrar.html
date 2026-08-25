@@ -713,8 +713,9 @@ function parseSheetDirect(wb,sheetName){
   var before=(sections['before_sec']||'').trim(),how=(sections['how_sec']||'').trim();
   var after=(sections['after_sec']||'').trim(),revenue=(sections['revenue_sec']||'').trim(),spread=(sections['spread_sec']||'').trim();
   var noRev=['없음','없음.','-',''];
-  if(revenue&&noRev.indexOf(revenue)===-1&&revenue.length>2)after=after+(after?'\n\n[매출/수익성 기여]\n':'')+revenue;
-  return{title:title,name:name,sub:(subTeam+(rank?' · '+rank:'')).trim(),org:'',field:field,month:deriveMonthFromDate(parsedDate||submitDate),submitDate:parsedDate||submitDate,tools:tools,before:before,how:how,after:after,highlight:'',spread:spread};
+  var highlight='';
+  if(revenue&&noRev.indexOf(revenue)===-1&&revenue.length>2)highlight=revenue;
+  return{title:title,name:name,sub:(subTeam+(rank?' · '+rank:'')).trim(),org:'',field:field,month:deriveMonthFromDate(parsedDate||submitDate),submitDate:parsedDate||submitDate,tools:tools,before:before,how:how,after:after,highlight:highlight,spread:spread};
 }
 function renderSheetPreview(fileName){
   var area=document.getElementById('sheetPreviewArea');

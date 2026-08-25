@@ -1285,8 +1285,9 @@ function parseSheetDirect(wb, sheetName) {
   var spread  = (sections['spread_sec']  || '').trim();
 
   var noRevenue = ['없음', '없음.', '-', ''];
+  var highlight = '';
   if (revenue && noRevenue.indexOf(revenue) === -1 && revenue.length > 2) {
-    after = after + (after ? '\n\n[매출/수익성 기여]\n' : '') + revenue;
+    highlight = revenue;
   }
 
   return {
@@ -1301,7 +1302,7 @@ function parseSheetDirect(wb, sheetName) {
     before:     before,
     how:        how,
     after:      after,
-    highlight:  '',
+    highlight:  highlight,
     spread:     spread
   };
 }
