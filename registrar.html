@@ -77,7 +77,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
 .form-textarea{padding:10px 13px;border:1.5px solid var(--bdr);border-radius:8px;font-size:13px;font-family:inherit;color:var(--txt);outline:none;resize:vertical;min-height:80px;line-height:1.65;background:#fafbff;transition:border-color .15s;}
 .form-textarea:focus{border-color:var(--blue2);background:#fff;}
 .form-textarea.err{border-color:var(--danger);background:#fff5f5;}
-.form-actions{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid var(--bdr);background:#f8fafd;}
+.form-actions{display:flex;flex-direction:column;gap:10px;padding:16px 22px;border-top:1px solid var(--bdr);background:#f8fafd;}
+.form-actions .btn{width:100%;justify-content:center;padding:14px 22px;font-size:15px;}
 
 /* ── 버튼 ── */
 .btn{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
@@ -93,13 +94,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
 .btn-success:hover{background:#25916a;}
 
 /* ── 업로드 존 ── */
-.upload-zone{border:2px dashed var(--bdr);border-radius:11px;padding:22px 20px;text-align:center;cursor:pointer;background:#fafbff;margin-bottom:16px;transition:all .15s;}
+.upload-zone{border:2px dashed var(--bdr);border-radius:11px;padding:10px 14px;text-align:center;cursor:pointer;background:#fafbff;margin-bottom:10px;transition:all .15s;}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--blue2);background:#eef3ff;}
-.upload-zone-icon{font-size:28px;margin-bottom:8px;}
-.upload-zone-title{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:4px;}
-.upload-zone-sub{font-size:12px;color:var(--txt2);}
-.upload-types{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
-.upload-type{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#eef3ff;color:var(--blue);}
+.upload-zone-icon{font-size:16px;margin-bottom:4px;}
+.upload-zone-title{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:2px;}
+.upload-zone-sub{font-size:10px;color:var(--txt2);}
+.upload-types{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:5px;}
+.upload-type{font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;background:#eef3ff;color:var(--blue);}
 .upload-prog{display:none;margin-top:12px;}
 .upload-prog-bg{height:5px;background:#e8eef8;border-radius:3px;overflow:hidden;}
 .upload-prog-bar{height:5px;background:var(--blue);border-radius:3px;width:0%;transition:width .3s;}
