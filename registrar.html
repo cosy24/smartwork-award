@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스마트워크 혁신상 · 사례 등록</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap');
+:root{
+  --blue:#1a3f7a;--blue2:#2d5fb5;--accent:#e8a020;--success:#2ea06b;--danger:#e05252;
+  --bg:#eef1f7;--card:#fff;--txt:#1a2340;--txt2:#5a6480;--bdr:#dde3ef;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+
+/* ── 헤더 ── */
+.hdr{background:var(--blue);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,63,122,.2);}
+.hdr-in{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 28px;}
+.hdr-logo{display:flex;align-items:center;gap:10px;}
+.logo-m{width:32px;height:32px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;}
+.logo-t{color:#fff;font-size:13px;font-weight:700;}
+.logo-s{color:rgba(255,255,255,.5);font-size:10px;margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.hdr-user-info{display:flex;align-items:center;gap:8px;}
+.hdr-avatar{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.4);}
+.hdr-user-name{color:#fff;font-size:13px;font-weight:600;}
+.hdr-user-email{color:rgba(255,255,255,.55);font-size:11px;}
+.hdr-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.btn-logout{padding:5px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);font-size:12px;cursor:pointer;font-family:inherit;}
+.btn-logout:hover{background:rgba(255,255,255,.2);}
+
+/* ── 로그인 ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f2a5e,#1a3f7a,#2d5fb5);}
+.login-box{background:#fff;border-radius:22px;padding:48px 44px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(10,20,50,.28);text-align:center;}
+.login-mark{width:60px;height:60px;background:var(--accent);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;color:#fff;margin-bottom:16px;}
+.login-title{font-size:20px;font-weight:800;color:var(--blue);margin-bottom:6px;}
+.login-sub{font-size:13px;color:var(--txt2);margin-bottom:32px;line-height:1.6;}
+.login-divider{display:flex;align-items:center;gap:12px;margin:24px 0;}
+.login-divider-line{flex:1;height:1px;background:var(--bdr);}
+.login-divider-txt{font-size:12px;color:var(--txt2);}
+/* Google 버튼 래퍼 */
+.google-btn-wrap{display:flex;justify-content:center;margin-bottom:8px;}
+.login-err{color:var(--danger);font-size:12px;margin-top:12px;min-height:18px;}
+.login-notice{background:#f0f4fa;border-radius:10px;padding:12px 16px;margin-top:20px;font-size:12px;color:var(--txt2);line-height:1.6;text-align:left;}
+.login-notice strong{color:var(--blue);}
+/* 접근 차단 화면 */
+.access-denied{background:#fff5f5;border:1px solid #fca5a5;border-radius:12px;padding:20px;margin-top:16px;display:none;}
+.access-denied-icon{font-size:32px;margin-bottom:10px;}
+.access-denied-title{font-size:15px;font-weight:700;color:var(--danger);margin-bottom:6px;}
+.access-denied-msg{font-size:12px;color:#b91c1c;line-height:1.6;}
+.btn-retry{margin-top:14px;padding:9px 20px;border-radius:8px;border:none;background:var(--danger);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* ── 앱 레이아웃 ── */
+.app{display:none;}
+.main{max-width:960px;margin:0 auto;padding:28px 28px 60px;display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;}
+
+/* ── 카드 ── */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:13px;overflow:hidden;margin-bottom:18px;}
+.card:last-child{margin-bottom:0;}
+.card-hd{background:var(--blue);padding:14px 20px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
+.card-hd-sub{font-size:11px;color:rgba(255,255,255,.6);font-weight:400;}
+.card-bd{padding:20px 22px;}
+
+/* ── 폼 ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-grid.full{grid-template-columns:1fr;}
+.form-field{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;}
+.form-label .req{color:var(--danger);}
+.form-input{padding:10px 13px;border:1.5px solid var(--bdr);border-radius:8px;font-size:13px;font-family:inherit;color:var(--txt);outline:none;background:#fafbff;transition:border-color .15s;}
+.form-input:focus{border-color:var(--blue2);background:#fff;}
+.form-input.err{border-color:var(--danger);background:#fff5f5;}
+.form-input[readonly]{background:#f0f4fa;color:var(--txt2);cursor:not-allowed;}
+.form-textarea{padding:10px 13px;border:1.5px solid var(--bdr);border-radius:8px;font-size:13px;font-family:inherit;color:var(--txt);outline:none;resize:vertical;min-height:80px;line-height:1.65;background:#fafbff;transition:border-color .15s;}
+.form-textarea:focus{border-color:var(--blue2);background:#fff;}
+.form-textarea.err{border-color:var(--danger);background:#fff5f5;}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid var(--bdr);background:#f8fafd;}
+
+/* ── 버튼 ── */
+.btn{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:var(--blue2);}
+.btn-ghost{background:#fff;color:var(--txt2);border:1.5px solid var(--bdr);}
+.btn-ghost:hover{border-color:#aaa;color:var(--txt);}
+.btn-danger{background:#fff5f5;color:var(--danger);border:1.5px solid #fca5a5;}
+.btn-danger:hover{background:#fee2e2;}
+.btn-sm{padding:6px 14px;font-size:11px;}
+.btn-xs{padding:4px 10px;font-size:10px;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-success:hover{background:#25916a;}
+
+/* ── 업로드 존 ── */
+.upload-zone{border:2px dashed var(--bdr);border-radius:11px;padding:22px 20px;text-align:center;cursor:pointer;background:#fafbff;margin-bottom:16px;transition:all .15s;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--blue2);background:#eef3ff;}
+.upload-zone-icon{font-size:28px;margin-bottom:8px;}
+.upload-zone-title{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:4px;}
+.upload-zone-sub{font-size:12px;color:var(--txt2);}
+.upload-types{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.upload-type{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#eef3ff;color:var(--blue);}
+.upload-prog{display:none;margin-top:12px;}
+.upload-prog-bg{height:5px;background:#e8eef8;border-radius:3px;overflow:hidden;}
+.upload-prog-bar{height:5px;background:var(--blue);border-radius:3px;width:0%;transition:width .3s;}
+.upload-prog-lbl{font-size:11px;color:var(--txt2);margin-top:5px;text-align:center;}
+/* 시트 프리뷰 */
+.sheet-wrap{background:#fff;border:1px solid var(--bdr);border-radius:11px;overflow:hidden;margin-bottom:16px;}
+.sheet-hd{background:var(--blue);padding:11px 16px;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
+.sheet-cnt{background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;}
+.sheet-list{padding:12px;}
+.sheet-card{background:#fafbff;border:1px solid var(--bdr);border-radius:9px;padding:11px 14px;margin-bottom:7px;}
+.sheet-card:last-child{margin-bottom:0;}
+.sheet-card.done{border-color:var(--success);background:#f0fbf5;}
+.sheet-card.error{border-color:var(--danger);background:#fff5f5;}
+.sheet-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.sheet-card-name{font-size:12px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:6px;}
+.sheet-tab{font-size:9px;font-weight:700;background:#e8eef8;color:var(--blue);padding:2px 6px;border-radius:4px;}
+.sheet-stat{font-size:10px;font-weight:700;}
+.sheet-stat.done{color:var(--success);}
+.sheet-stat.error{color:var(--danger);}
+.sheet-preview{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px;}
+.sheet-prev-field{font-size:10px;color:var(--txt2);}
+.sheet-prev-field strong{color:var(--txt);font-weight:600;}
+.sheet-footer{display:flex;justify-content:flex-end;gap:8px;padding:11px 12px;border-top:1px solid var(--bdr);background:#f8fafd;}
+
+/* ── 내 목록 ── */
+.my-list-empty{text-align:center;padding:36px 20px;color:var(--txt2);}
+.my-list-empty-icon{font-size:36px;margin-bottom:10px;}
+.my-agenda-row{background:#fff;border:1px solid var(--bdr);border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:0;margin-bottom:10px;transition:box-shadow .15s;}
+.my-agenda-row:hover{box-shadow:0 2px 10px rgba(26,63,122,.08);}
+.my-agenda-main{display:flex;align-items:center;gap:12px;}
+.my-ag-num{width:30px;height:30px;border-radius:8px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.my-ag-info{flex:1;min-width:0;}
+.my-ag-title{font-size:13px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.my-ag-meta{font-size:11px;color:var(--txt2);margin-top:2px;}
+.my-ag-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#e6f4ee;color:var(--success);}
+.my-ag-actions{display:flex;gap:5px;flex-shrink:0;}
+.status-bar{background:linear-gradient(135deg,#f0f4fa,#e8eef8);border:1px solid var(--bdr);border-radius:10px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+.status-bar-info{font-size:12px;color:var(--txt2);}
+.status-bar-count{font-size:20px;font-weight:900;color:var(--blue);}
+
+/* ── 유저 프로필 카드 ── */
+.user-profile-card{background:linear-gradient(135deg,#f0f4fa,#e8eef8);border:1px solid var(--bdr);border-radius:11px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.profile-avatar{width:42px;height:42px;border-radius:50%;border:2px solid var(--bdr);}
+.profile-info{flex:1;}
+.profile-name{font-size:14px;font-weight:700;color:var(--blue);}
+.profile-email{font-size:11px;color:var(--txt2);margin-top:2px;}
+.profile-badge{background:var(--blue);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;display:inline-block;}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2340;color:#fff;padding:10px 20px;border-radius:9px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:400;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:800px){.main{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ── 로그인 화면 ── -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="login-mark">M</div>
+    <div class="login-title">스마트워크 혁신상</div>
+    <div class="login-sub">AI 도구 활용 우수사례 · 사례 등록 시스템<br>구글 워크스페이스 계정으로 로그인하세요</div>
+
+    <!-- Google One Tap / 버튼 -->
+    <div class="google-btn-wrap">
+      <div id="g_id_onload"
+           data-client_id="YOUR_GOOGLE_CLIENT_ID"
+           data-callback="handleGoogleLogin"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+           data-type="standard"
+           data-size="large"
+           data-theme="outline"
+           data-text="signin_with"
+           data-shape="rectangular"
+           data-logo_alignment="left"
+           data-width="320">
+      </div>
+    </div>
+
+    <div class="login-err" id="loginErr"></div>
+
+    <!-- 접근 차단 -->
+    <div class="access-denied" id="accessDenied">
+      <div class="access-denied-icon">🚫</div>
+      <div class="access-denied-title">접근이 제한된 계정입니다</div>
+      <div class="access-denied-msg" id="accessDeniedMsg"></div>
+      <button class="btn-retry" id="btnRetry">다른 계정으로 로그인</button>
+    </div>
+
+    <div class="login-notice">
+      <strong>접속 가능 계정:</strong> 회사 구글 워크스페이스 계정<br>
+      (<span id="allowedDomainTxt">@your-company.com</span>)<br>
+      개인 Gmail 계정은 접근이 제한됩니다.
+    </div>
+  </div>
+</div>
+
+<!-- ── 앱 화면 ── -->
+<div id="appScreen" class="app">
+  <header class="hdr">
+    <div class="hdr-in">
+      <div class="hdr-logo">
+        <div class="logo-m">M</div>
+        <div>
+          <div class="logo-t">MiraeN 에듀파트너 · 스마트워크 혁신상</div>
+          <div class="logo-s">AI 도구 활용 우수사례 · 사례 등록</div>
+        </div>
+      </div>
+      <div class="hdr-right">
+        <div class="hdr-user-info">
+          <img class="hdr-avatar" id="hdrAvatar" src="" alt="">
+          <div>
+            <div class="hdr-user-name" id="hdrName"></div>
+            <div class="hdr-user-email" id="hdrEmail"></div>
+          </div>
+        </div>
+        <span class="hdr-badge">등록자</span>
+        <button class="btn-logout" id="btnLogout">로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- 좌: 등록 폼 -->
+    <div>
+      <div class="card" id="regFormCard">
+        <div class="card-hd">
+          <span id="regFormTitle">➕ 새 사례 등록</span>
+          <span class="card-hd-sub">* 필수 항목</span>
+        </div>
+        <div class="card-bd">
+          <!-- 파일 업로드 -->
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" style="display:none"
+              accept=".xlsx,.xls,.pptx,.ppt,.docx,.doc,.pdf,.png,.jpg,.jpeg,.gif,.webp">
+            <div class="upload-zone-icon">📎</div>
+            <div class="upload-zone-title">파일 업로드로 자동 작성</div>
+            <div class="upload-zone-sub">드래그하거나 클릭 · AI가 내용을 자동 추출합니다</div>
+            <div class="upload-types">
+              <span class="upload-type">XLSX</span><span class="upload-type">PPTX</span>
+              <span class="upload-type">DOCX</span><span class="upload-type">PDF</span>
+              <span class="upload-type">이미지</span>
+            </div>
+          </div>
+          <div class="upload-prog" id="uploadProg">
+            <div class="upload-prog-bg"><div class="upload-prog-bar" id="uploadProgBar"></div></div>
+            <div class="upload-prog-lbl" id="uploadProgLbl">분석 중...</div>
+          </div>
+          <div id="sheetPreviewArea"></div>
+
+          <!-- 폼 -->
+          <div class="form-grid full">
+            <div class="form-field">
+              <label class="form-label">아젠다명(제목) <span class="req">*</span></label>
+              <input class="form-input" id="rf_title" placeholder="예) 지역본부 매출현황 대시보드화">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">제출자 이름 <span class="req">*</span></label>
+              <input class="form-input" id="rf_name" placeholder="예) 홍길동">
+            </div>
+            <div class="form-field">
+              <label class="form-label">소속 · 직급 <span class="req">*</span></label>
+              <input class="form-input" id="rf_sub" placeholder="예) 전략기획팀 · 선임">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">조직 <span class="req">*</span></label>
+              <input class="form-input" id="rf_org" placeholder="예) AX1, AX2">
+            </div>
+            <div class="form-field">
+              <label class="form-label">업무 분야 <span class="req">*</span></label>
+              <input class="form-input" id="rf_field" placeholder="예) 기획, 영업, 재무">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">발표 월 <span class="req">*</span></label>
+              <input class="form-input" id="rf_month" placeholder="예) 2026년 7월">
+            </div>
+            <div class="form-field">
+              <label class="form-label">제출일 <span class="req">*</span></label>
+              <input class="form-input" id="rf_submitDate" placeholder="예) 2026. 7. 1">
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="form-field">
+              <label class="form-label">활용 도구 <span class="req">*</span></label>
+              <input class="form-input" id="rf_tools" placeholder="예) Claude · Python">
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="form-field">
+              <label class="form-label">Before — 기존 업무 방식 <span class="req">*</span></label>
+              <textarea class="form-textarea" id="rf_before" placeholder="AI 도구 활용 이전 방식, 소요 시간·인력 포함"></textarea>
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="form-field">
+              <label class="form-label">How — AI 활용 방식 <span class="req">*</span></label>
+              <textarea class="form-textarea" id="rf_how" placeholder="구체적인 활용 방법, 프로세스 변화"></textarea>
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="form-field">
+              <label class="form-label">After — 성과 및 효과 <span class="req">*</span></label>
+              <textarea class="form-textarea" id="rf_after" placeholder="정량적 성과: 시간 XX% 단축, 비용 XX만원 절감 등"></textarea>
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="form-field">
+              <label class="form-label">핵심 절감 수치 <span style="font-weight:400;color:#aaa">(선택)</span></label>
+              <input class="form-input" id="rf_highlight" placeholder="예) 월 119,583원 절감 (연간 약 143.5만원)">
+            </div>
+          </div>
+          <div class="form-grid full">
+            <div class="form-field">
+              <label class="form-label">확산 가능성 <span class="req">*</span></label>
+              <textarea class="form-textarea" id="rf_spread" placeholder="타 팀·부서 적용 가능 여부 및 방법"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost" id="btnClear">초기화</button>
+          <button class="btn btn-ghost" id="btnCancelEdit" style="display:none">수정 취소</button>
+          <button class="btn btn-primary" id="btnSubmit">사례 등록</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 우: 내 등록 목록 -->
+    <div>
+      <!-- 구글 프로필 카드 -->
+      <div class="user-profile-card" id="userProfileCard">
+        <img class="profile-avatar" id="profileAvatar" src="" alt="">
+        <div class="profile-info">
+          <div class="profile-name" id="profileName"></div>
+          <div class="profile-email" id="profileEmail"></div>
+          <div class="profile-badge">등록자 모드</div>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div class="status-bar-info">내가 등록한 사례</div>
+        <div class="status-bar-count" id="myCount">0건</div>
+      </div>
+      <div id="myAgendaList">
+        <div class="my-list-empty">
+          <div class="my-list-empty-icon">📋</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:5px;">등록된 사례가 없습니다</div>
+          <div style="font-size:12px;">왼쪽 양식으로 등록해 주세요</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1BoNEoR6WG1y3WPb-Q8QgS93pJJ9SC-Qt6ar_PIT64uNQNPh-3HSxruAsy9rp7Z_e/exec';
+function apiGet(action) {
+  return fetch(SCRIPT_URL+'?action='+action).then(function(res){ return res.json(); }).then(function(d){ return d.ok?d.data:Promise.reject(d.error); });
+}
+function apiPost(action, data) {
+  return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,data:data})}).then(function(res){return res.json();}).then(function(d){ return d.ok?d.data:Promise.reject(d.error); });
+}
+
+
+/* ══ CONFIG ══════════════════════════════════════════
+   ① Google Cloud Console에서 발급한 클라이언트 ID 입력
+   ② 허용할 구글 워크스페이스 도메인 설정
+      - 전체 허용: ALLOWED_DOMAINS = [] (빈 배열)
+      - 특정 도메인만: ['miraen.com', 'miraen.co.kr']
+══════════════════════════════════════════════════════ */
+var GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+var ALLOWED_DOMAINS  = ['miraen.com', 'miraen.co.kr'];  // 빈 배열이면 모든 구글 계정 허용
+
+var STORAGE_AGENDAS  = 'smartwork_agendas';
+
+/* ── 현재 유저 정보 ── */
+var currentUser = null;
+/* 구조: {
+    email: 'hong@miraen.com',
+    name:  '홍길동',
+    picture: 'https://...',
+    sub:   '구글 고유 ID'
+} */
+
+var AGENDAS   = [];
+var editingId = null;
+var sheetData = [];
+
+/* ══ Google OAuth 콜백 ══ */
+function handleGoogleLogin(response) {
+  var err = document.getElementById('loginErr');
+  err.textContent = '';
+
+  try {
+    // JWT 파싱 (검증은 서버에서 해야 하지만, 클라이언트 전용 앱이므로 페이로드만 파싱)
+    var payload = JSON.parse(atob(response.credential.split('.')[1]));
+
+    // 도메인 체크
+    if (ALLOWED_DOMAINS.length > 0) {
+      var email = payload.email || '';
+      var domain = email.split('@')[1] || '';
+      var allowed = ALLOWED_DOMAINS.some(function(d){ return domain === d; });
+      if (!allowed) {
+        showAccessDenied(
+          '이 계정(' + email + ')은 접근이 허용되지 않습니다.\n' +
+          '허용 도메인: ' + ALLOWED_DOMAINS.join(', ') + '\n' +
+          '담당자에게 문의하세요.'
+        );
+        return;
+      }
+    }
+
+    // 로그인 성공
+    currentUser = {
+      email:   payload.email,
+      name:    payload.name,
+      picture: payload.picture,
+      sub:     payload.sub
+    };
+
+    onLoginSuccess();
+
+  } catch(e) {
+    err.textContent = '로그인 처리 중 오류가 발생했습니다. 다시 시도해 주세요.';
+  }
+}
+
+function showAccessDenied(msg) {
+  document.getElementById('accessDenied').style.display = 'block';
+  document.getElementById('accessDeniedMsg').textContent = msg;
+}
+
+function onLoginSuccess() {
+  // 화면 전환
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+
+  // 헤더 정보
+  document.getElementById('hdrName').textContent  = currentUser.name;
+  document.getElementById('hdrEmail').textContent = currentUser.email;
+  if (currentUser.picture) {
+    document.getElementById('hdrAvatar').src = currentUser.picture;
+  }
+
+  // 우측 프로필 카드
+  document.getElementById('profileName').textContent  = currentUser.name;
+  document.getElementById('profileEmail').textContent = currentUser.email;
+  if (currentUser.picture) {
+    document.getElementById('profileAvatar').src = currentUser.picture;
+  }
+
+  loadAgendas(function(){ renderMyList(); });
+}
+
+function doLogout() {
+  // Google 세션 해제
+  if (typeof google !== 'undefined' && google.accounts) {
+    google.accounts.id.disableAutoSelect();
+  }
+  currentUser = null;
+  AGENDAS = [];
+  editingId = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('accessDenied').style.display = 'none';
+  document.getElementById('loginErr').textContent = '';
+  clearForm();
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', function() {
+  // 허용 도메인 안내 업데이트
+  var domainTxt = ALLOWED_DOMAINS.length > 0
+    ? ALLOWED_DOMAINS.map(function(d){ return '@'+d; }).join(', ')
+    : '모든 구글 계정 허용';
+  document.getElementById('allowedDomainTxt').textContent = domainTxt;
+
+  // Google Client ID 주입 (동적)
+  var onload = document.getElementById('g_id_onload');
+  if (onload) onload.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+
+  document.getElementById('btnLogout').addEventListener('click', doLogout);
+  document.getElementById('btnRetry').addEventListener('click', function(){
+    document.getElementById('accessDenied').style.display = 'none';
+  });
+  document.getElementById('btnSubmit').addEventListener('click', submitAgenda);
+  document.getElementById('btnClear').addEventListener('click', clearForm);
+  document.getElementById('btnCancelEdit').addEventListener('click', cancelEdit);
+  bindUpload();
+});
+
+/* ══ STORAGE ══ */
+function loadAgendas(cb) {
+  apiGet('getAgendas').then(function(data){ AGENDAS=data||[]; if(cb) cb(); }).catch(function(){ AGENDAS=[]; if(cb) cb(); });
+}
+function loadLocal(cb) {
+  var s=localStorage.getItem(STORAGE_AGENDAS);
+  AGENDAS=[]; if(s){try{AGENDAS=JSON.parse(s);}catch(e){AGENDAS=[];}}
+  if(cb) cb();
+}
+function saveAgendas(cb) {
+  apiPost('saveAgendas', AGENDAS).then(function(){ if(cb) cb(); }).catch(function(e){ console.error('saveAgendas 오류:',e); if(cb) cb(); });
+}
+
+/* ══ 폼 ══ */
+function getFormValues() {
+  var ids=['title','name','sub','org','field','month','submitDate','tools','before','how','after','highlight','spread'];
+  var v={}; ids.forEach(function(id){var el=document.getElementById('rf_'+id);v[id]=el?el.value.trim():'';});
+  return v;
+}
+function setFormValues(v) {
+  var ids=['title','name','sub','org','field','month','submitDate','tools','before','how','after','highlight','spread'];
+  ids.forEach(function(id){var el=document.getElementById('rf_'+id);if(el)el.value=v[id]||'';});
+}
+function clearForm() {
+  setFormValues({});
+  resetUploadUI();
+  editingId=null;
+  document.getElementById('regFormTitle').textContent='➕ 새 사례 등록';
+  document.getElementById('btnSubmit').textContent='사례 등록';
+  document.getElementById('btnCancelEdit').style.display='none';
+  document.querySelectorAll('.form-input.err,.form-textarea.err').forEach(function(el){el.classList.remove('err');});
+}
+function cancelEdit(){ clearForm(); }
+
+function submitAgenda() {
+  var v=getFormValues();
+  var required=['title','name','sub','org','field','month','submitDate','tools','before','how','after','spread'];
+  var hasErr=false;
+  required.forEach(function(k){
+    var el=document.getElementById('rf_'+k);
+    if(!v[k]){if(el)el.classList.add('err');hasErr=true;}
+    else{if(el)el.classList.remove('err');}
+  });
+  if(hasErr){showToast('⚠️ 필수 항목을 모두 입력해 주세요.');return;}
+
+  if(editingId){
+    var ag=AGENDAS.find(function(a){return a.id===editingId;});
+    if(ag){Object.assign(ag,v);ag.updatedAt=Date.now();}
+    showToast('✅ 사례가 수정되었습니다.');
+  } else {
+    var newAg=Object.assign({},v,{
+      id:'r'+Date.now(),
+      num:String(AGENDAS.length+1).padStart(2,'0'),
+      regDate:Date.now(),
+      registeredBy:     currentUser.email,
+      registeredByName: currentUser.name,
+      registeredByPic:  currentUser.picture,
+      deployed:false
+    });
+    AGENDAS.push(newAg);
+    showToast('✅ ' + v.title + ' 등록 완료!');
+  }
+
+  saveAgendas(function(){
+    editingId=null;
+    clearForm();
+    renderMyList();
+  });
+}
+
+function startEdit(id) {
+  var ag=AGENDAS.find(function(a){return a.id===id;});if(!ag)return;
+  editingId=id; setFormValues(ag);
+  document.getElementById('regFormTitle').textContent='✏️ 사례 수정';
+  document.getElementById('btnSubmit').textContent='수정 완료';
+  document.getElementById('btnCancelEdit').style.display='inline-flex';
+  document.getElementById('regFormCard').scrollIntoView({behavior:'smooth'});
+}
+
+function deleteAgenda(id) {
+  var ag=AGENDAS.find(function(a){return a.id===id;});if(!ag)return;
+  if(!confirm('"'+(ag.title||ag.name)+'"을 삭제하겠습니까?'))return;
+  AGENDAS=AGENDAS.filter(function(a){return a.id!==id;});
+  AGENDAS.forEach(function(a,i){a.num=String(i+1).padStart(2,'0');});
+  saveAgendas(function(){renderMyList();showToast('🗑 삭제되었습니다.');});
+}
+
+/* ══ 내 목록 렌더 ══ */
+function renderMyList() {
+  // 이메일 기준으로 내 아젠다 필터
+  var myAgs=AGENDAS.filter(function(ag){
+    return ag.registeredBy===currentUser.email;
+  });
+  var list=document.getElementById('myAgendaList');
+  document.getElementById('myCount').textContent=myAgs.length+'건';
+
+  if(myAgs.length===0){
+    list.innerHTML='<div class="my-list-empty"><div class="my-list-empty-icon">📋</div><div style="font-size:13px;font-weight:600;margin-bottom:5px;">등록된 사례가 없습니다</div><div style="font-size:12px;">왼쪽 양식으로 등록해 주세요</div></div>';
+    return;
+  }
+  list.innerHTML='';
+  myAgs.slice().reverse().forEach(function(ag){
+    var regStr=ag.regDate?new Date(ag.regDate).toLocaleDateString('ko-KR'):'—';
+    var row=document.createElement('div');
+    row.className='my-agenda-row';
+    row.innerHTML=
+      '<div class="my-agenda-main">'+
+        '<div class="my-ag-num">'+ag.num+'</div>'+
+        '<div class="my-ag-info">'+
+          '<div class="my-ag-title">'+(ag.title||ag.name)+'</div>'+
+          '<div class="my-ag-meta">'+ag.name+' · '+ag.org+' · '+ag.field+' · '+regStr+'</div>'+
+        '</div>'+
+        '<span class="my-ag-badge">등록완료</span>'+
+        '<div class="my-ag-actions">'+
+          '<button class="btn btn-ghost btn-xs btn-edit" data-id="'+ag.id+'">수정</button>'+
+          '<button class="btn btn-danger btn-xs btn-del" data-id="'+ag.id+'">삭제</button>'+
+        '</div>'+
+      '</div>';
+    list.appendChild(row);
+  });
+  list.querySelectorAll('.btn-edit').forEach(function(b){b.addEventListener('click',function(){startEdit(this.dataset.id);});});
+  list.querySelectorAll('.btn-del').forEach(function(b){b.addEventListener('click',function(){deleteAgenda(this.dataset.id);});});
+}
+
+/* ══ 파일 업로드 ══ */
+function bindUpload(){
+  var zone=document.getElementById('uploadZone');
+  var fi=document.getElementById('fileInput');
+  zone.addEventListener('click',function(){fi.click();});
+  zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave',function(){zone.classList.remove('drag');});
+  zone.addEventListener('drop',function(e){e.preventDefault();zone.classList.remove('drag');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
+  fi.addEventListener('change',function(){if(this.files[0])handleFile(this.files[0]);});
+}
+function handleFile(file){
+  var ext=file.name.split('.').pop().toLowerCase();
+  var allowed=['xlsx','xls','pptx','ppt','docx','doc','pdf','png','jpg','jpeg','gif','webp'];
+  if(allowed.indexOf(ext)===-1){showToast('⚠️ 지원하지 않는 파일 형식');return;}
+  if(ext==='xlsx'||ext==='xls'){handleExcel(file);return;}
+  handleSingle(file,ext);
+}
+function handleSingle(file,ext){
+  showUploadProg(true);
+  var isImg=['png','jpg','jpeg','gif','webp'].indexOf(ext)!==-1;
+  var prompt='AI 도구 활용 사례 내용을 추출하세요. JSON으로만 반환(마크다운 없이): {"title":"","name":"","sub":"","org":"","field":"","month":"","submitDate":"","tools":"","before":"","how":"","after":"","highlight":"","spread":""}';
+  fileToB64(file).then(function(b64){
+    var content=isImg
+      ?[{type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:b64}},{type:'text',text:prompt}]
+      :[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:prompt}];
+    return callClaude(content);
+  }).then(function(parsed){showUploadProg(false);setFormValues(parsed);showToast('✅ 분석 완료!');})
+  .catch(function(){showUploadProg(false);showToast('⚠️ 분석 실패. 직접 입력하세요.');});
+}
+function handleExcel(file){
+  showUploadProg(true,'엑셀 읽는 중...');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      var skipSheets=['안내','가이드','양식','설명','목차','표지'];
+      var validSheets=wb.SheetNames.filter(function(n){
+        if(skipSheets.indexOf(n)!==-1)return false;
+        var rows2=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''});
+        return rows2.filter(function(r){return r[0]&&String(r[0]).trim().length>2;}).length>=5;
+      });
+      showUploadProg(false);
+      if(validSheets.length===0){showToast('⚠️ 분석 가능한 시트가 없습니다.');return;}
+      if(validSheets.length===1){setFormValues(parseSheetDirect(wb,validSheets[0]));showToast('✅ '+validSheets[0]+' 분석 완료!');}
+      else{
+        sheetData=validSheets.map(function(n){return{name:n,parsed:parseSheetDirect(wb,n),status:'done'};});
+        renderSheetPreview(file.name);
+        var btn=document.getElementById('btnBatchReg');
+        if(btn){btn.disabled=false;btn.textContent=sheetData.length+'개 사례 일괄 등록';}
+        showToast('✅ '+sheetData.length+'개 시트 분석 완료!');
+      }
+    }catch(err){showUploadProg(false);showToast('⚠️ 엑셀 읽기 실패: '+err.message);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+function parseSheetDirect(wb,sheetName){
+  var ws=wb.Sheets[sheetName];
+  var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+  var lines=[];
+  rows.forEach(function(r){var val=r[0]?String(r[0]).replace(/\u00a0/g,' ').trim():'';if(val)lines.push(val);});
+  var SECTION_KEYS={'1) 제출자 정보':'info','2) 활용한 AI 도구':'tools_sec','3) 업무 분야':'field_sec','4) 기존 업무 방식':'before_sec','5) AI 활용 방식':'how_sec','6) 성과 및 효과':'after_sec','7) 매출/수익성 기여':'revenue_sec','8) 확산 가능성':'spread_sec','※ 첨부 자료':'attach_sec'};
+  var GUIDE=['AI 도구 활용 사례 제출 양식','AI 도구 활용 이전에는','어떻게 AI 도구를','어떤 성과가','AI 활용으로 직접','이 방법을 다른 팀','스크린샷, 비교 데이터','예) ChatGPT','예) 기획, 마케팅'];
+  function isGuide(t){return GUIDE.some(function(p){return t.indexOf(p)!==-1;});}
+  function getSK(t){var f=null;Object.keys(SECTION_KEYS).forEach(function(k){if(t.indexOf(k)!==-1)f=SECTION_KEYS[k];});return f;}
+  var sections={},curSec=null,curLines=[],submitDate='';
+  lines.forEach(function(line){
+    if(!submitDate&&/^\d{4}[.\-\/]\d{2}[.\-\/]\d{2}/.test(line)){submitDate=line;return;}
+    var sk=getSK(line);
+    if(sk){if(curSec&&curLines.length)sections[curSec]=curLines.join('\n').trim();curSec=sk;curLines=[];}
+    else if(curSec&&!isGuide(line))curLines.push(line);
+  });
+  if(curSec&&curLines.length)sections[curSec]=curLines.join('\n').trim();
+  var infoRaw=sections['info']||'',name='',subTeam='',rank='',parsedDate='',title='';
+  var m;
+  m=infoRaw.match(/이름[:\s\u00a0]+([가-힣A-Za-z]+)/);if(m)name=m[1].trim();
+  m=infoRaw.match(/팀[:\s\u00a0]+([가-힣A-Za-z0-9\s]+?)(?:직급|$)/);if(m)subTeam=m[1].trim();
+  m=infoRaw.match(/직급[:\s\u00a0]*([가-힣A-Za-z0-9]+)/);if(m)rank=m[1].trim();
+  m=infoRaw.match(/제출일[:\s\u00a0]*([0-9.\/\-]+)/);if(m)parsedDate=m[1].trim();
+  m=infoRaw.match(/제목\s*[:\uff1a]\s*(.+)/);if(m)title=m[1].trim();
+  if(!title)lines.forEach(function(l){if(!title&&/^제목\s*[:\uff1a]/.test(l))title=l.replace(/^제목\s*[:\uff1a]\s*/,'').trim();});
+  if(!name)name=sheetName;
+  function extract(raw){return(raw||'').split('\n').filter(function(l){return l.trim()&&l.indexOf('예)')===-1;}).join('\n').trim();}
+  var tools=extract(sections['tools_sec']),field=extract(sections['field_sec']);
+  var before=(sections['before_sec']||'').trim(),how=(sections['how_sec']||'').trim();
+  var after=(sections['after_sec']||'').trim(),revenue=(sections['revenue_sec']||'').trim(),spread=(sections['spread_sec']||'').trim();
+  var noRev=['없음','없음.','-',''];
+  if(revenue&&noRev.indexOf(revenue)===-1&&revenue.length>2)after=after+(after?'\n\n[매출/수익성 기여]\n':'')+revenue;
+  return{title:title,name:name,sub:(subTeam+(rank?' · '+rank:'')).trim(),org:'',field:field,month:'',submitDate:parsedDate||submitDate,tools:tools,before:before,how:how,after:after,highlight:'',spread:spread};
+}
+function renderSheetPreview(fileName){
+  var area=document.getElementById('sheetPreviewArea');
+  var html='<div class="sheet-wrap"><div class="sheet-hd"><span>📊 '+fileName+'</span><span class="sheet-cnt">'+sheetData.length+'개 시트</span></div><div class="sheet-list">';
+  sheetData.forEach(function(s){
+    var p=s.parsed||{};
+    html+='<div class="sheet-card done"><div class="sheet-card-top"><div class="sheet-card-name"><span class="sheet-tab">Sheet</span>'+s.name+'</div><span class="sheet-stat done">분석 완료</span></div>';
+    html+='<div class="sheet-preview">';
+    if(p.title)html+='<div class="sheet-prev-field">📌 <strong>'+p.title+'</strong></div>';
+    if(p.name)html+='<div class="sheet-prev-field">👤 <strong>'+p.name+'</strong></div>';
+    if(p.field)html+='<div class="sheet-prev-field">💼 <strong>'+p.field+'</strong></div>';
+    if(p.tools)html+='<div class="sheet-prev-field">🤖 <strong>'+p.tools+'</strong></div>';
+    html+='</div></div>';
+  });
+  html+='</div><div class="sheet-footer"><button class="btn btn-ghost btn-sm" id="btnCancelSheets">취소</button><button class="btn btn-success btn-sm" id="btnBatchReg">'+sheetData.length+'개 사례 일괄 등록</button></div></div>';
+  area.innerHTML=html;
+  document.getElementById('btnCancelSheets').addEventListener('click',function(){area.innerHTML='';resetUploadUI();sheetData=[];});
+  document.getElementById('btnBatchReg').addEventListener('click',batchRegister);
+}
+function batchRegister(){
+  var now=Date.now(),added=0;
+  sheetData.forEach(function(s,i){
+    if(s.status==='done'&&s.parsed&&s.parsed.name){
+      var ag=Object.assign({},s.parsed,{
+        id:'r'+(now+i),num:String(AGENDAS.length+1).padStart(2,'0'),
+        regDate:now+i,registeredBy:currentUser.email,
+        registeredByName:currentUser.name,deployed:false
+      });
+      AGENDAS.push(ag);added++;
+    }
+  });
+  saveAgendas(function(){
+    document.getElementById('sheetPreviewArea').innerHTML='';
+    resetUploadUI();sheetData=[];renderMyList();
+    showToast('✅ '+added+'개 사례 등록 완료!');
+  });
+}
+function callClaude(content){
+  return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:content}]})
+  }).then(function(r){return r.json();}).then(function(d){
+    var text='';if(d.content)d.content.forEach(function(c){if(c.type==='text')text+=c.text;});
+    try{return JSON.parse(text.replace(/```json|```/g,'').trim());}catch(e){return{};}
+  });
+}
+function fileToB64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(e){res(e.target.result.split(',')[1]);};r.onerror=rej;r.readAsDataURL(file);});}
+function showUploadProg(show,msg){var p=document.getElementById('uploadProg');var z=document.getElementById('uploadZone');if(show){z.style.display='none';p.style.display='block';if(msg)document.getElementById('uploadProgLbl').textContent=msg;}else{z.style.display='block';p.style.display='none';document.getElementById('uploadProgBar').style.width='0%';}}
+function resetUploadUI(){showUploadProg(false);document.getElementById('fileInput').value='';}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);}
+</script>
+</body>
+</html>
