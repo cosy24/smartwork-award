@@ -701,20 +701,12 @@ function filterByDeployAt(agendas) {
   });
 }
 function loadEvals(cb) {
-  try {
-    window.storage.get(STORAGE_EVALS, true).then(function(r){
-      var data={}; if(r&&r.value){try{data=JSON.parse(r.value);}catch(e){data={};}}
-      cb(data);
-    });
-  } catch(e) {
-    var s=localStorage.getItem(STORAGE_EVALS);
-    var data={}; if(s){try{data=JSON.parse(s);}catch(ex){data={};}}
-    cb(data);
-  }
+  apiGet('getEvals').then(function(data){
+    cb(data || {});
+  }).catch(function(e){ console.error('loadEvals 오류:', e); cb({}); });
 }
 function saveEvals() {
-  try { window.storage.set(STORAGE_EVALS, JSON.stringify(evals), true); }
-  catch(e) { localStorage.setItem(STORAGE_EVALS, JSON.stringify(evals)); }
+  apiPost('saveEvals', evals).catch(function(e){ console.error('saveEvals 오류:', e); });
 }
 
 /* ══ LOGIN ══ */

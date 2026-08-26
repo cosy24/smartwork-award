@@ -843,36 +843,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* ══ STORAGE ═══════════════════════════════════ */
 function saveAgendas() {
-  try { window.storage.set(STORAGE_AGENDAS, JSON.stringify(AGENDAS), true); } catch(e) {
-    localStorage.setItem(STORAGE_AGENDAS, JSON.stringify(AGENDAS));
-  }
+  saveAgendas_remote();
 }
 function loadAgendas() {
-  try {
-    window.storage.get(STORAGE_AGENDAS, true).then(function(r) {
-      if (r && r.value) { try { AGENDAS = JSON.parse(r.value); } catch(e) { AGENDAS = []; } }
-      renderAgendaList();
-    });
-  } catch(e) {
-    var s = localStorage.getItem(STORAGE_AGENDAS);
-    if (s) { try { AGENDAS = JSON.parse(s); } catch(ex) { AGENDAS = []; } }
-  }
+  loadAgendas_remote(renderAgendaList);
 }
 function getEvals() {
-  return new Promise(function(resolve) {
-    try {
-      window.storage.get(STORAGE_EVALS, true).then(function(r) {
-        var data = {};
-        if (r && r.value) { try { data = JSON.parse(r.value); } catch(e) { data = {}; } }
-        resolve(data);
-      });
-    } catch(e) {
-      var s = localStorage.getItem(STORAGE_EVALS);
-      var data = {};
-      if (s) { try { data = JSON.parse(s); } catch(ex) { data = {}; } }
-      resolve(data);
-    }
-  });
+  return getEvals_remote();
 }
 
 /* ══ NAV ════════════════════════════════════════ */
@@ -1423,14 +1400,6 @@ function deployAgendas() {
   });
   saveAgendas();
 
-  // 최신 배포 데이터
-  var deployData = { agendas: deployedAgs, deployedAt: now };
-  try {
-    var p = window.storage && window.storage.set(STORAGE_DEPLOYED, JSON.stringify(deployData), true);
-    if (!p || !p.then) throw new Error();
-    p.catch(function(){ localStorage.setItem(STORAGE_DEPLOYED, JSON.stringify(deployData)); });
-  } catch(e) { localStorage.setItem(STORAGE_DEPLOYED, JSON.stringify(deployData)); }
-
   // 배포 이력 누적 저장
   loadDeployHistory(function(history) {
     // 같은 날짜(일) 배포가 있으면 업데이트, 없으면 추가
@@ -1477,16 +1446,8 @@ function clearDeployData() {
   if (!confirm('배포 및 평가 데이터를 모두 초기화하겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
   AGENDAS.forEach(function(ag){ ag.deployed=false; ag.deployedAt=null; });
   saveAgendas();
-  var empty = '{}', emptyArr = '[]';
-  function trySet(key, val) {
-    if (typeof window !== 'undefined' && window.storage && typeof window.storage.set === 'function') {
-      try { window.storage.set(key, val, true); return; } catch(e) {}
-    }
-    localStorage.setItem(key, val);
-  }
-  trySet(STORAGE_EVALS, empty);
-  trySet(STORAGE_DEPLOYED, empty);
-  trySet(STORAGE_DEPLOY_HISTORY, emptyArr);
+  saveEvals({});
+  saveDeployHistory([]);
   renderDeployPanel(); renderAgendaList();
   showToast('🗑 초기화 완료');
 }
