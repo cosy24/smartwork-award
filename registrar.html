@@ -401,13 +401,21 @@ var editingId = null;
 var sheetData = [];
 
 /* ══ Google OAuth 콜백 ══ */
+function decodeJwtPayload(token) {
+  var b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  var binary = atob(b64);
+  var bytes = new Uint8Array(binary.length);
+  for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+}
+
 function handleGoogleLogin(response) {
   var err = document.getElementById('loginErr');
   err.textContent = '';
 
   try {
     // JWT 파싱 (검증은 서버에서 해야 하지만, 클라이언트 전용 앱이므로 페이로드만 파싱)
-    var payload = JSON.parse(atob(response.credential.split('.')[1]));
+    var payload = decodeJwtPayload(response.credential);
 
     // 도메인 체크
     if (ALLOWED_DOMAINS.length > 0) {
