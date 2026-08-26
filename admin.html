@@ -1459,12 +1459,15 @@ function showEvalInfo() {
   alert('평가자 파일(evaluator.html)을 동일한 웹서버에 배포하세요.\n평가자는 evaluator.html에 접속 후 로그인하여 평가를 진행합니다.\n관리자가 아젠다를 배포하면 자동으로 반영됩니다.');
 }
 
+var deployRenderToken = 0;
 function renderDeployPanel() {
+  var myToken = ++deployRenderToken;
   var deployed = AGENDAS.filter(function(a){ return a.deployed; });
   document.getElementById('deployAgCount').textContent = AGENDAS.length;
   document.getElementById('depStatTotal').textContent = AGENDAS.length;
   document.getElementById('depStatDep').textContent = deployed.length;
   getEvals().then(function(evals) {
+    if (myToken !== deployRenderToken) return; // 이후에 더 최신 렌더링이 시작됐다면 이 결과는 무시
     var total = 0;
     deployed.forEach(function(ag) {
       EVALUATOR_KEYS.forEach(function(k) {
