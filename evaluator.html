@@ -549,30 +549,40 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
 
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1BoNEoR6WG1y3WPb-Q8QgS93pJJ9SC-Qt6ar_PIT64uNQNPh-3HSxruAsy9rp7Z_e/exec';
 
-var _apiQueue = Promise.resolve();
+var _apiActive = 0;
+var _apiMaxConcurrent = 2;
+var _apiPending = [];
 function apiCallWithRetry(body) {
-  function attemptFetch() {
-    return fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body)
-    }).then(function(r){ return r.json(); }).then(function(d){
-      if (!d.ok) throw new Error(d.error);
-      return d.data;
-    });
-  }
-  function withRetry(n) {
-    return attemptFetch().catch(function(e){
-      if (n < 2) {
-        return new Promise(function(res){ setTimeout(res, 700 * (n + 1)); })
-          .then(function(){ return withRetry(n + 1); });
+  return new Promise(function(resolve, reject) {
+    function run() {
+      _apiActive++;
+      function attemptFetch() {
+        return fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(body)
+        }).then(function(r){ return r.json(); }).then(function(d){
+          if (!d.ok) throw new Error(d.error);
+          return d.data;
+        });
       }
-      throw e;
-    });
-  }
-  var task = _apiQueue.then(function(){ return withRetry(0); }, function(){ return withRetry(0); });
-  _apiQueue = task.catch(function(){});
-  return task;
+      function withRetry(n) {
+        return attemptFetch().catch(function(e){
+          if (n < 2) {
+            return new Promise(function(res){ setTimeout(res, 700 * (n + 1)); })
+              .then(function(){ return withRetry(n + 1); });
+          }
+          throw e;
+        });
+      }
+      withRetry(0).then(resolve, reject).finally(function(){
+        _apiActive--;
+        if (_apiPending.length) { var next = _apiPending.shift(); next(); }
+      });
+    }
+    if (_apiActive < _apiMaxConcurrent) run();
+    else _apiPending.push(run);
+  });
 }
 function apiGet(action, params) {
   var body = { action: action };
