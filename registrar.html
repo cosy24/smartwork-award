@@ -331,7 +331,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
         <div class="form-actions">
           <button class="btn btn-ghost" id="btnClear">초기화</button>
           <button class="btn btn-ghost" id="btnCancelEdit" style="display:none">수정 취소</button>
-          <button class="btn btn-primary" id="btnSubmit">사례 등록</button>
+          <button class="btn btn-primary" id="btnSubmit">아젠다 등록</button>
         </div>
       </div>
     </div>
@@ -569,7 +569,7 @@ function clearForm() {
   resetUploadUI();
   editingId=null;
   document.getElementById('regFormTitle').textContent='➕ 새 사례 등록';
-  document.getElementById('btnSubmit').textContent='사례 등록';
+  document.getElementById('btnSubmit').textContent='아젠다 등록';
   document.getElementById('btnCancelEdit').style.display='none';
   document.querySelectorAll('.form-input.err,.form-textarea.err').forEach(function(el){el.classList.remove('err');});
 }
