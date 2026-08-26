@@ -369,10 +369,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
 
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1BoNEoR6WG1y3WPb-Q8QgS93pJJ9SC-Qt6ar_PIT64uNQNPh-3HSxruAsy9rp7Z_e/exec';
 function apiGet(action) {
-  return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action})}).then(function(res){return res.json();}).then(function(d){ return d.ok?d.data:Promise.reject(d.error); });
+  return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:action})}).then(function(res){return res.json();}).then(function(d){ return d.ok?d.data:Promise.reject(d.error); });
 }
 function apiPost(action, data) {
-  return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,data:data})}).then(function(res){return res.json();}).then(function(d){ return d.ok?d.data:Promise.reject(d.error); });
+  return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:action,data:data})}).then(function(res){return res.json();}).then(function(d){ return d.ok?d.data:Promise.reject(d.error); });
 }
 
 

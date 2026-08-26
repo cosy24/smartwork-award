@@ -681,7 +681,7 @@ function apiGet(action, params) {
   if (params) Object.keys(params).forEach(function(k){ body[k] = params[k]; });
   return fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(body)
   }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) throw new Error(d.error);
@@ -692,7 +692,7 @@ function apiGet(action, params) {
 function apiPost(action, data) {
   return fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ action: action, data: data })
   }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) throw new Error(d.error);
@@ -746,7 +746,7 @@ function getAttachFiles_remote(agId) {
 }
 function saveAttachFiles_remote(agId, files) {
   return fetch(SCRIPT_URL, {
-    method:'POST', headers:{'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify({ action:'saveAttach', agId:agId, data:files })
   }).then(function(r){ return r.json(); });
 }
@@ -1363,7 +1363,7 @@ function batchRegister() {
 
 function callClaude(content) {
   return fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST', headers:{'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:content}]})
   }).then(function(r){ return r.json(); }).then(function(d){
     var text = '';
@@ -1760,7 +1760,7 @@ function saveAttachFiles(agId, newFiles) {
 
 function deleteAttachFile(agId, idx) {
   fetch(SCRIPT_URL, {
-    method:'POST', headers:{'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify({ action:'deleteAttach', agId:agId, idx:idx })
   }).then(function(){
     renderAttachListForAgenda(agId, document.getElementById('attach-list-' + agId));

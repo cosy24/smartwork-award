@@ -554,7 +554,7 @@ function apiGet(action, params) {
   if (params) Object.keys(params).forEach(function(k){ body[k] = params[k]; });
   return fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(body)
   }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) throw new Error(d.error);
@@ -563,7 +563,7 @@ function apiGet(action, params) {
 }
 function apiPost(action, data) {
   return fetch(SCRIPT_URL, {
-    method:'POST', headers:{'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify({ action:action, data:data })
   }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) throw new Error(d.error);
