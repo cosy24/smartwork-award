@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>스마트워크 혁신상 · 사례 등록</title>
+<title>스마트워크 혁신상 · 아젠다 등록</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -163,7 +163,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
   <div class="login-box">
     <div class="login-mark">M</div>
     <div class="login-title">스마트워크 혁신상</div>
-    <div class="login-sub">AI 도구 활용 우수사례 · 사례 등록 시스템<br>구글 워크스페이스 계정으로 로그인하세요</div>
+    <div class="login-sub">AI 도구 활용 우수아젠다 · 아젠다 등록 시스템<br>구글 워크스페이스 계정으로 로그인하세요</div>
 
     <!-- Google One Tap / 버튼 -->
     <div class="google-btn-wrap">
@@ -209,7 +209,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
         <div class="logo-m">M</div>
         <div>
           <div class="logo-t">MiraeN 에듀파트너 · 스마트워크 혁신상</div>
-          <div class="logo-s">AI 도구 활용 우수사례 · 사례 등록</div>
+          <div class="logo-s">AI 도구 활용 우수아젠다 · 아젠다 등록</div>
         </div>
       </div>
       <div class="hdr-right">
@@ -231,7 +231,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
     <div>
       <div class="card" id="regFormCard">
         <div class="card-hd">
-          <span id="regFormTitle">➕ 새 사례 등록</span>
+          <span id="regFormTitle">➕ 새 아젠다 등록</span>
           <span class="card-hd-sub">* 필수 항목</span>
         </div>
         <div class="card-bd">
@@ -349,13 +349,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)
       </div>
 
       <div class="status-bar">
-        <div class="status-bar-info">내가 등록한 사례</div>
+        <div class="status-bar-info">내가 등록한 아젠다</div>
         <div class="status-bar-count" id="myCount">0건</div>
       </div>
       <div id="myAgendaList">
         <div class="my-list-empty">
           <div class="my-list-empty-icon">📋</div>
-          <div style="font-size:13px;font-weight:600;margin-bottom:5px;">등록된 사례가 없습니다</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:5px;">등록된 아젠다가 없습니다</div>
           <div style="font-size:12px;">왼쪽 양식으로 등록해 주세요</div>
         </div>
       </div>
@@ -568,7 +568,7 @@ function clearForm() {
   setFormValues({});
   resetUploadUI();
   editingId=null;
-  document.getElementById('regFormTitle').textContent='➕ 새 사례 등록';
+  document.getElementById('regFormTitle').textContent='➕ 새 아젠다 등록';
   document.getElementById('btnSubmit').textContent='아젠다 등록';
   document.getElementById('btnCancelEdit').style.display='none';
   document.querySelectorAll('.form-input.err,.form-textarea.err').forEach(function(el){el.classList.remove('err');});
@@ -589,7 +589,7 @@ function submitAgenda() {
   if(editingId){
     var ag=AGENDAS.find(function(a){return a.id===editingId;});
     if(ag){Object.assign(ag,v);ag.updatedAt=Date.now();}
-    showToast('✅ 사례가 수정되었습니다.');
+    showToast('✅ 아젠다가 수정되었습니다.');
   } else {
     var newAg=Object.assign({},v,{
       id:'r'+Date.now(),
@@ -614,7 +614,7 @@ function submitAgenda() {
 function startEdit(id) {
   var ag=AGENDAS.find(function(a){return a.id===id;});if(!ag)return;
   editingId=id; setFormValues(ag);
-  document.getElementById('regFormTitle').textContent='✏️ 사례 수정';
+  document.getElementById('regFormTitle').textContent='✏️ 아젠다 수정';
   document.getElementById('btnSubmit').textContent='수정 완료';
   document.getElementById('btnCancelEdit').style.display='inline-flex';
   document.getElementById('regFormCard').scrollIntoView({behavior:'smooth'});
@@ -638,7 +638,7 @@ function renderMyList() {
   document.getElementById('myCount').textContent=myAgs.length+'건';
 
   if(myAgs.length===0){
-    list.innerHTML='<div class="my-list-empty"><div class="my-list-empty-icon">📋</div><div style="font-size:13px;font-weight:600;margin-bottom:5px;">등록된 사례가 없습니다</div><div style="font-size:12px;">왼쪽 양식으로 등록해 주세요</div></div>';
+    list.innerHTML='<div class="my-list-empty"><div class="my-list-empty-icon">📋</div><div style="font-size:13px;font-weight:600;margin-bottom:5px;">등록된 아젠다가 없습니다</div><div style="font-size:12px;">왼쪽 양식으로 등록해 주세요</div></div>';
     return;
   }
   list.innerHTML='';
@@ -685,7 +685,7 @@ function handleFile(file){
 function handleSingle(file,ext){
   showUploadProg(true);
   var isImg=['png','jpg','jpeg','gif','webp'].indexOf(ext)!==-1;
-  var prompt='AI 도구 활용 사례 내용을 추출하세요. JSON으로만 반환(마크다운 없이): {"title":"","name":"","sub":"","org":"","field":"","month":"","submitDate":"","tools":"","before":"","how":"","after":"","highlight":"","spread":""}';
+  var prompt='AI 도구 활용 아젠다 내용을 추출하세요. JSON으로만 반환(마크다운 없이): {"title":"","name":"","sub":"","org":"","field":"","month":"","submitDate":"","tools":"","before":"","how":"","after":"","highlight":"","spread":""}';
   fileToB64(file).then(function(b64){
     var content=isImg
       ?[{type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:b64}},{type:'text',text:prompt}]
@@ -713,7 +713,7 @@ function handleExcel(file){
         sheetData=validSheets.map(function(n){return{name:n,parsed:parseSheetDirect(wb,n),status:'done'};});
         renderSheetPreview(file.name);
         var btn=document.getElementById('btnBatchReg');
-        if(btn){btn.disabled=false;btn.textContent=sheetData.length+'개 사례 일괄 등록';}
+        if(btn){btn.disabled=false;btn.textContent=sheetData.length+'개 아젠다 일괄 등록';}
         showToast('✅ '+sheetData.length+'개 시트 분석 완료!');
       }
     }catch(err){showUploadProg(false);showToast('⚠️ 엑셀 읽기 실패: '+err.message);}
@@ -727,7 +727,7 @@ function parseSheetDirect(wb,sheetName){
   var lines=[];
   rows.forEach(function(r){var raw=r[0]||r[1];var val=raw?String(raw).replace(/\u00a0/g,' ').trim():'';if(val)lines.push(val);});
   var SECTION_KEYS={'1) 제출자 정보':'info','2) 활용한 AI 도구':'tools_sec','3) 업무 분야':'field_sec','4) 기존 업무 방식':'before_sec','5) AI 활용 방식':'how_sec','6) 성과 및 효과':'after_sec','7) 매출/수익성 기여':'revenue_sec','8) 확산 가능성':'spread_sec','※ 첨부 자료':'attach_sec'};
-  var GUIDE=['AI 도구 활용 사례 제출 양식','AI 도구 활용 이전에는','어떻게 AI 도구를','어떤 성과가','AI 활용으로 직접','이 방법을 다른 팀','스크린샷, 비교 데이터','예) ChatGPT','예) 기획, 마케팅'];
+  var GUIDE=['AI 도구 활용 아젠다 제출 양식','AI 도구 활용 이전에는','어떻게 AI 도구를','어떤 성과가','AI 활용으로 직접','이 방법을 다른 팀','스크린샷, 비교 데이터','예) ChatGPT','예) 기획, 마케팅'];
   function isGuide(t){return GUIDE.some(function(p){return t.indexOf(p)!==-1;});}
   function getSK(t){var f=null;Object.keys(SECTION_KEYS).forEach(function(k){if(t.indexOf(k)!==-1)f=SECTION_KEYS[k];});return f;}
   var sections={},curSec=null,curLines=[],submitDate='';
@@ -769,7 +769,7 @@ function renderSheetPreview(fileName){
     if(p.tools)html+='<div class="sheet-prev-field">🤖 <strong>'+p.tools+'</strong></div>';
     html+='</div></div>';
   });
-  html+='</div><div class="sheet-footer"><button class="btn btn-ghost btn-sm" id="btnCancelSheets">취소</button><button class="btn btn-success btn-sm" id="btnBatchReg">'+sheetData.length+'개 사례 일괄 등록</button></div></div>';
+  html+='</div><div class="sheet-footer"><button class="btn btn-ghost btn-sm" id="btnCancelSheets">취소</button><button class="btn btn-success btn-sm" id="btnBatchReg">'+sheetData.length+'개 아젠다 일괄 등록</button></div></div>';
   area.innerHTML=html;
   document.getElementById('btnCancelSheets').addEventListener('click',function(){area.innerHTML='';resetUploadUI();sheetData=[];});
   document.getElementById('btnBatchReg').addEventListener('click',batchRegister);
@@ -789,7 +789,7 @@ function batchRegister(){
   saveAgendas(function(){
     document.getElementById('sheetPreviewArea').innerHTML='';
     resetUploadUI();sheetData=[];renderMyList();
-    showToast('✅ '+added+'개 사례 등록 완료!');
+    showToast('✅ '+added+'개 아젠다 등록 완료!');
   });
 }
 function callClaude(content){
