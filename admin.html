@@ -1520,6 +1520,7 @@ function renderResultPanel() {
   getEvals().then(function(evals) {
     var rows = [];
     AGENDAS.forEach(function(ag) {
+      if (!ag.deployed) return; // 배포된 아젠다만 평가 현황에 표시
       EVALUATOR_KEYS.forEach(function(key) {
         var d = evals[key] && evals[key][ag.id];
         var isDone = !!d;
