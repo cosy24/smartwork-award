@@ -676,9 +676,8 @@ table td.center{text-align:center;}
 ═══════════════════════════════════════════════════════ */
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1BoNEoR6WG1y3WPb-Q8QgS93pJJ9SC-Qt6ar_PIT64uNQNPh-3HSxruAsy9rp7Z_e/exec';
 
-function apiGet(action, params) {
-  var body = { action: action };
-  if (params) Object.keys(params).forEach(function(k){ body[k] = params[k]; });
+function apiCallWithRetry(body, attempt) {
+  attempt = attempt || 0;
   return fetch(SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -686,18 +685,22 @@ function apiGet(action, params) {
   }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) throw new Error(d.error);
     return d.data;
+  }).catch(function(e){
+    if (attempt < 2) {
+      return new Promise(function(res){ setTimeout(res, 700 * (attempt + 1)); })
+        .then(function(){ return apiCallWithRetry(body, attempt + 1); });
+    }
+    throw e;
   });
+}
+function apiGet(action, params) {
+  var body = { action: action };
+  if (params) Object.keys(params).forEach(function(k){ body[k] = params[k]; });
+  return apiCallWithRetry(body);
 }
 
 function apiPost(action, data) {
-  return fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: action, data: data })
-  }).then(function(r){ return r.json(); }).then(function(d){
-    if (!d.ok) throw new Error(d.error);
-    return d.data;
-  });
+  return apiCallWithRetry({ action: action, data: data });
 }
 
 /* ── 아젠다 저장/로드 ── */
