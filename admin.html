@@ -677,9 +677,13 @@ table td.center{text-align:center;}
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1BoNEoR6WG1y3WPb-Q8QgS93pJJ9SC-Qt6ar_PIT64uNQNPh-3HSxruAsy9rp7Z_e/exec';
 
 function apiGet(action, params) {
-  var url = SCRIPT_URL + '?action=' + action;
-  if (params) Object.keys(params).forEach(function(k){ url += '&'+k+'='+encodeURIComponent(params[k]); });
-  return fetch(url).then(function(r){ return r.json(); }).then(function(d){
+  var body = { action: action };
+  if (params) Object.keys(params).forEach(function(k){ body[k] = params[k]; });
+  return fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) throw new Error(d.error);
     return d.data;
   });
@@ -738,8 +742,7 @@ function saveDeployHistory_remote(history) {
 
 /* ── 첨부파일 저장/로드 ── */
 function getAttachFiles_remote(agId) {
-  return fetch(SCRIPT_URL+'?action=getAttach&agId='+encodeURIComponent(agId))
-    .then(function(r){ return r.json(); }).then(function(d){ return d.ok ? d.data : []; });
+  return apiGet('getAttach', { agId: agId });
 }
 function saveAttachFiles_remote(agId, files) {
   return fetch(SCRIPT_URL, {
